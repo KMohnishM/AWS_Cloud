@@ -64,7 +64,7 @@ sed 's/\r$//' database_init.sql > database_init_unix.sql
 
 # Initialize the database with the schema
 echo "Initializing database schema..."
-cat database_init_unix.sql | docker run -i --rm mysql:5.7 mysql -h ${RDS_HOSTNAME} -u ${RDS_USERNAME} -p${RDS_PASSWORD} ${RDS_DB_NAME}
+cat database_init_unix.sql | docker run -i --rm mysql:5.7 mysql -h ${RDS_HOSTNAME} -u ${RDS_USERNAME} -p${RDS_PASSWORD} healthcare
 
 if [ $? -ne 0 ]; then
     echo "Error: Failed to initialize database schema"

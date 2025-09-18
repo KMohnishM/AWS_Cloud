@@ -2,7 +2,7 @@
 -- This script should be run against the RDS instance to create the initial schema
 
 -- Use the specified database
-USE `database-1`;
+USE `healthcare`;
 
 -- Create Users table
 CREATE TABLE IF NOT EXISTS `users` (
