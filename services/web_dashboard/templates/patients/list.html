@@ -1,0 +1,323 @@
+{% extends 'base.html' %}
+
+{% block title %}Patients | Hospital Monitoring System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .patient-card {
+        transition: transform 0.3s;
+    }
+    .patient-card:hover {
+        transform: translateY(-5px);
+    }
+    .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .status-normal {
+        background-color: #28a745;
+    }
+    .status-warning {
+        background-color: #ffc107;
+    }
+    .status-critical {
+        background-color: #dc3545;
+    }
+    .search-box {
+        max-width: 300px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1>Patients</h1>
+        <p class="lead">Manage and monitor patient information</p>
+    </div>
+    <div class="col-auto d-flex align-items-center">
+        <a href="{{ url_for('patients.add_patient') }}" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Add New Patient
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="input-group search-box">
+            <input type="text" class="form-control" placeholder="Search patients..." id="patient-search">
+            <button class="btn btn-outline-secondary" type="button">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+    <div class="col-md-6 d-flex justify-content-md-end">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-primary active" id="view-grid">
+                <i class="bi bi-grid"></i> Grid
+            </button>
+            <button type="button" class="btn btn-outline-primary" id="view-list">
+                <i class="bi bi-list-ul"></i> List
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Status Filter -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-outline-secondary active" data-filter="all">All Patients</button>
+            <button type="button" class="btn btn-outline-success" data-filter="normal">
+                <span class="status-indicator status-normal"></span> Normal
+            </button>
+            <button type="button" class="btn btn-outline-warning" data-filter="warning">
+                <span class="status-indicator status-warning"></span> Warning
+            </button>
+            <button type="button" class="btn btn-outline-danger" data-filter="critical">
+                <span class="status-indicator status-critical"></span> Critical
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Grid View (Default) -->
+<div class="row" id="patients-grid">
+    {% if patients %}
+        {% for patient in patients %}
+        <div class="col-md-4 mb-4">
+            <div class="card patient-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ patient.first_name }} {{ patient.last_name }}</h5>
+                    <span class="badge {% if patient.status == 'normal' %}bg-success{% elif patient.status == 'warning' %}bg-warning{% else %}bg-danger{% endif %}">
+                        {{ patient.status.capitalize() }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p><strong>ID:</strong> {{ patient.id }}</p>
+                    <p><strong>Age:</strong> {{ patient.age }}</p>
+                    <p><strong>Room:</strong> {{ patient.room_number }}</p>
+                    <p><strong>Admitted:</strong> {{ patient.admission_date.strftime('%Y-%m-%d') }}</p>
+                    <hr>
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('patients.view_patient', patient_id=patient.id) }}" class="btn btn-outline-primary">
+                            <i class="bi bi-eye"></i> View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="col">
+            <div class="alert alert-info">
+                No patients found. <a href="{{ url_for('patients.add_patient') }}">Add a new patient</a>.
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<!-- List View (Hidden by default) -->
+<div class="row d-none" id="patients-list">
+    <div class="col">
+        <div class="card">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Room</th>
+                                <th>Admission Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if patients %}
+                                {% for patient in patients %}
+                                <tr>
+                                    <td>
+                                        <span class="status-indicator {% if patient.status == 'normal' %}status-normal{% elif patient.status == 'warning' %}status-warning{% else %}status-critical{% endif %}"></span>
+                                        {{ patient.status.capitalize() }}
+                                    </td>
+                                    <td>{{ patient.id }}</td>
+                                    <td>{{ patient.first_name }} {{ patient.last_name }}</td>
+                                    <td>{{ patient.age }}</td>
+                                    <td>{{ patient.room_number }}</td>
+                                    <td>{{ patient.admission_date.strftime('%Y-%m-%d') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('patients.view_patient', patient_id=patient.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{{ url_for('patients.edit_patient', patient_id=patient.id) }}" class="btn btn-sm btn-outline-secondary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ patient.id }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center">No patients found.</td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pagination -->
+<div class="row mt-4">
+    <div class="col">
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+{% if patients %}
+    {% for patient in patients %}
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal{{ patient.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ patient.id }}" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel{{ patient.id }}">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete patient <strong>{{ patient.first_name }} {{ patient.last_name }}</strong>? This action cannot be undone.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="{{ url_for('patients.delete_patient', patient_id=patient.id) }}" method="POST">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // View toggle
+        const gridView = document.getElementById('view-grid');
+        const listView = document.getElementById('view-list');
+        const patientsGrid = document.getElementById('patients-grid');
+        const patientsList = document.getElementById('patients-list');
+        
+        gridView.addEventListener('click', function() {
+            patientsGrid.classList.remove('d-none');
+            patientsList.classList.add('d-none');
+            gridView.classList.add('active');
+            listView.classList.remove('active');
+        });
+        
+        listView.addEventListener('click', function() {
+            patientsGrid.classList.add('d-none');
+            patientsList.classList.remove('d-none');
+            gridView.classList.remove('active');
+            listView.classList.add('active');
+        });
+        
+        // Search functionality
+        const searchInput = document.getElementById('patient-search');
+        searchInput.addEventListener('keyup', function() {
+            const searchTerm = this.value.toLowerCase();
+            const patientCards = document.querySelectorAll('.patient-card');
+            const patientRows = document.querySelectorAll('#patients-list tbody tr');
+            
+            // Search in grid view
+            patientCards.forEach(card => {
+                const patientName = card.querySelector('h5').textContent.toLowerCase();
+                const patientDetails = card.querySelectorAll('.card-body p');
+                let patientText = patientName;
+                
+                patientDetails.forEach(detail => {
+                    patientText += ' ' + detail.textContent.toLowerCase();
+                });
+                
+                if (patientText.includes(searchTerm)) {
+                    card.parentElement.style.display = '';
+                } else {
+                    card.parentElement.style.display = 'none';
+                }
+            });
+            
+            // Search in list view
+            patientRows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                if (rowText.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        // Filter by status
+        const filterButtons = document.querySelectorAll('[data-filter]');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                
+                // Update active button
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Filter in grid view
+                const patientCards = document.querySelectorAll('.patient-card');
+                patientCards.forEach(card => {
+                    const statusBadge = card.querySelector('.badge');
+                    const status = statusBadge.textContent.trim().toLowerCase();
+                    
+                    if (filter === 'all' || status === filter) {
+                        card.parentElement.style.display = '';
+                    } else {
+                        card.parentElement.style.display = 'none';
+                    }
+                });
+                
+                // Filter in list view
+                const patientRows = document.querySelectorAll('#patients-list tbody tr');
+                patientRows.forEach(row => {
+                    if (row.cells.length > 1) { // Skip "No patients found" row
+                        const status = row.cells[0].textContent.trim().toLowerCase();
+                        
+                        if (filter === 'all' || status.includes(filter)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

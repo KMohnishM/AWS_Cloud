@@ -1,0 +1,124 @@
+version: '3'
+
+services:
+  # Web Dashboard Service
+  web_dashboard:
+    build:
+      context: ./services/web_dashboard
+    container_name: hospital_web_dashboard
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - SECRET_KEY=your_secret_key_change_in_production
+      # Amazon RDS Configuration
+      - DB_USER=${RDS_USERNAME}
+      - DB_PASSWORD=${RDS_PASSWORD}
+      - DB_HOST=${RDS_HOSTNAME}
+      - DB_PORT=${RDS_PORT}
+      - DB_NAME=${RDS_DB_NAME}
+    depends_on:
+      - main_host
+    volumes:
+      - ./services/web_dashboard:/app
+    networks:
+      - hospital_network
+
+  # Main Host Service
+  main_host:
+    build: ./main_host
+    container_name: hospital_main_host
+    restart: always
+    ports:
+      - "5001:5000"
+    environment:
+      # Amazon RDS Configuration for storing telemetry data
+      - DB_USER=${RDS_USERNAME}
+      - DB_PASSWORD=${RDS_PASSWORD}
+      - DB_HOST=${RDS_HOSTNAME}
+      - DB_PORT=${RDS_PORT}
+      - DB_NAME=${RDS_DB_NAME}
+    networks:
+      - hospital_network
+
+  # ML Service
+  ml_service:
+    build: ./ml_service
+    container_name: hospital_ml_service
+    restart: always
+    ports:
+      - "5002:5000"
+    networks:
+      - hospital_network
+
+  # Patient Data Service
+  patient:
+    build: ./patient
+    container_name: hospital_patient_service
+    restart: always
+    networks:
+      - hospital_network
+
+  # Prometheus Service
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./alert.rules.yml:/etc/prometheus/alert.rules.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - hospital_network
+
+  # Alert Manager Service
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    restart: always
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    networks:
+      - hospital_network
+
+  # Grafana Service
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: always
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_SECURITY_X_FRAME_OPTIONS=
+    depends_on:
+      - prometheus
+    networks:
+      - hospital_network
+
+volumes:
+  grafana_data: {}
+
+networks:
+  hospital_network:
+    driver: bridge
