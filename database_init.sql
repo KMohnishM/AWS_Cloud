@@ -9,15 +9,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- Initialize database for Hospital Monitoring System
 -- This script should be run against the RDS instance to create the initial schema
 
--- Use the specified database
 USE `healthcare`;
-DROP TABLE IF EXISTS `emergency_contacts`;
-DROP TABLE IF EXISTS `patient_medical_history`;
-DROP TABLE IF EXISTS `patient_vital_signs`;
-DROP TABLE IF EXISTS `patient_locations`;
-DROP TABLE IF EXISTS `user_sessions`;
-DROP TABLE IF EXISTS `patients`;
-DROP TABLE IF EXISTS `users`;
 CREATE TABLE IF NOT EXISTS `users` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `username` VARCHAR(50) NOT NULL UNIQUE,
@@ -109,16 +101,14 @@ CREATE TABLE IF NOT EXISTS `patient_medical_history` (
 INSERT INTO `users` (`username`, `email`, `password_hash`, `first_name`, `last_name`, `role`, `is_active`)
 VALUES ('admin', 'admin@hospital.com', '$2b$12$lW.reQiB5JXivrL0g.MQPObAzGrOQRY/S89Yl5YS8vw5heXjUz1lW', 'System', 'Administrator', 'admin', TRUE);
 
--- Create sample patients (optional)
-INSERT INTO `patients` (`first_name`, `last_name`, `date_of_birth`, `gender`, `blood_type`, `admission_date`)
+INSERT INTO `patients` (`mrn`, `first_name`, `last_name`, `date_of_birth`, `gender`, `blood_type`, `admission_date`, `status`)
 VALUES 
-('John', 'Doe', '1975-05-15', 'male', 'A+', CURDATE()),
-('Jane', 'Smith', '1982-09-23', 'female', 'O-', CURDATE()),
-('Robert', 'Johnson', '1968-11-03', 'male', 'B+', CURDATE());
+('MRN001', 'John', 'Doe', '1975-05-15', 'male', 'A+', CURDATE(), 'admitted'),
+('MRN002', 'Jane', 'Smith', '1982-09-23', 'female', 'O-', CURDATE(), 'admitted'),
+('MRN003', 'Robert', 'Johnson', '1968-11-03', 'male', 'B+', CURDATE(), 'admitted');
 
--- Add sample locations for patients
-INSERT INTO `patient_locations` (`patient_id`, `room_number`, `bed_number`, `department`)
+INSERT INTO `patient_locations` (`patient_id`, `hospital`, `department`, `ward`, `bed`)
 VALUES 
-(1, '101', 'A', 'Cardiology'),
-(2, '102', 'B', 'General'),
-(3, '103', 'A', 'Pulmonology');
+(1, 'Main Hospital', 'Cardiology', 'Ward A', '101A'),
+(2, 'Main Hospital', 'General', 'Ward B', '102B'),
+(3, 'Main Hospital', 'Pulmonology', 'Ward A', '103A');
