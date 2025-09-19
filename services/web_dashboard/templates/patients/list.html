@@ -103,7 +103,7 @@
                     <p><strong>Admitted:</strong> {{ patient.admission_date.strftime('%Y-%m-%d') }}</p>
                     <hr>
                     <div class="d-grid gap-2">
-                        <a href="{{ url_for('patients.view_patient', patient_id=patient.id) }}" class="btn btn-outline-primary">
+                        <a href="{{ url_for('patients.view_patient', patient_id=patient.patient_id) }}" class="btn btn-outline-primary">
                             <i class="bi bi-eye"></i> View Details
                         </a>
                     </div>
@@ -152,10 +152,10 @@
                                     <td>{{ patient.room_number }}</td>
                                     <td>{{ patient.admission_date.strftime('%Y-%m-%d') }}</td>
                                     <td>
-                                        <a href="{{ url_for('patients.view_patient', patient_id=patient.id) }}" class="btn btn-sm btn-outline-primary">
+                                        <a href="{{ url_for('patients.view_patient', patient_id=patient.patient_id) }}" class="btn btn-sm btn-outline-primary">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <a href="{{ url_for('patients.edit_patient', patient_id=patient.id) }}" class="btn btn-sm btn-outline-secondary">
+                                        <a href="{{ url_for('patients.edit_patient', patient_id=patient.patient_id) }}" class="btn btn-sm btn-outline-secondary">
                                             <i class="bi bi-pencil"></i>
                                         </a>
                                         <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ patient.id }}">
