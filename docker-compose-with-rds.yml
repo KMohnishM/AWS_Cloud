@@ -28,7 +28,7 @@ services:
 
   # Main Host Service
   main_host:
-    build: ./main_host
+    build: ./services/main_host
     container_name: hospital_main_host
     restart: always
     ports:
@@ -45,7 +45,7 @@ services:
 
   # ML Service
   ml_service:
-    build: ./ml_service
+    build: ./services/ml_service
     container_name: hospital_ml_service
     restart: always
     ports:
@@ -53,13 +53,6 @@ services:
     networks:
       - hospital_network
 
-  # Patient Data Service
-  patient:
-    build: ./patient
-    container_name: hospital_patient_service
-    restart: always
-    networks:
-      - hospital_network
 
   # Prometheus Service
   prometheus:

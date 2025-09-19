@@ -10,7 +10,7 @@ auth = Blueprint('auth', __name__)
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('index'))
+        return redirect(url_for('main.dashboard'))
         
     if request.method == 'POST':
         username = request.form.get('username')
@@ -35,7 +35,7 @@ def login():
         # Create session record
         session = UserSession(
             session_id=request.cookies.get('session'),
-            user_id=user.user_id,
+            user_id=user.id,
             ip_address=request.remote_addr,
             user_agent=request.user_agent.string,
             expires_at=datetime.utcnow() + timedelta(days=30) if remember else None
@@ -51,7 +51,7 @@ def login():
         # Redirect to the page the user was trying to access
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('index')
+            next_page = url_for('main.dashboard')
             
         return redirect(next_page)
         
@@ -104,7 +104,7 @@ def logout():
     # Find and invalidate the current session
     session = UserSession.query.filter_by(
         session_id=request.cookies.get('session'),
-        user_id=current_user.user_id
+        user_id=current_user.id
     ).first()
     
     if session:

@@ -105,7 +105,7 @@ class PatientVitalSign(db.Model):
     respiratory_rate = db.Column(db.Float)
     temperature = db.Column(db.Float)
     etco2 = db.Column(db.Float)
-    recorded_by = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    recorded_by = db.Column(db.Integer, db.ForeignKey('users.id'))
     recorded_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationship with user who recorded
@@ -141,7 +141,7 @@ class PatientMedicalHistory(db.Model):
     treatment = db.Column(db.Text)
     medication = db.Column(db.String(255))
     notes = db.Column(db.Text)
-    recorded_by = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    recorded_by = db.Column(db.Integer, db.ForeignKey('users.id'))
     recorded_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationship with user who recorded

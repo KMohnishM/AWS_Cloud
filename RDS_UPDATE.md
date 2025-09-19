@@ -4,7 +4,7 @@ The project has been updated to connect to the Amazon RDS MySQL database with th
 
 - **Database Host**: database-1.cxkucyeociny.ap-south-1.rds.amazonaws.com
 - **Database Port**: 3306
-- **Database Name**: database-1
+- **Database Name**: healthcare
 - **Database User**: admin
 
 ## Changes Made

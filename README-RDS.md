@@ -45,16 +45,16 @@ The system now uses Amazon RDS (MySQL) for storing:
    RDS_PASSWORD=Zvg3NRkRiLkX6qlub6Mc
    RDS_HOSTNAME=database-1.cxkucyeociny.ap-south-1.rds.amazonaws.com
    RDS_PORT=3306
-   RDS_DB_NAME=database-1
+   RDS_DB_NAME=healthcare
    ```
 
 3. Create the database on your RDS instance:
    ```sql
-   USE database-1;
+   USE healthcare;
    
    -- Run the database_init.sql script to create all required tables
    -- You can do this by connecting to your RDS instance with a MySQL client:
-   -- mysql -h database-1.cxkucyeociny.ap-south-1.rds.amazonaws.com -u admin -p database-1 < database_init.sql
+   -- mysql -h database-1.cxkucyeociny.ap-south-1.rds.amazonaws.com -u admin -p healthcare < database_init.sql
    ```
 
 4. The application will automatically create the necessary tables on first run.

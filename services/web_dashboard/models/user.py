@@ -3,12 +3,13 @@ from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 
+# Initialize SQLAlchemy without app (we'll initialize it later in app.py)
 db = SQLAlchemy()
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
     
-    user_id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)  # Changed from user_id to id for Flask-Login
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
@@ -19,11 +20,6 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     last_login = db.Column(db.DateTime)
     is_active = db.Column(db.Boolean, default=True)
-    
-    # Flask-Login requires id attribute
-    @property
-    def id(self):
-        return self.user_id
     
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -65,7 +61,7 @@ class UserSession(db.Model):
     __tablename__ = 'user_sessions'
     
     session_id = db.Column(db.String(128), primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     ip_address = db.Column(db.String(45))
     user_agent = db.Column(db.String(256))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

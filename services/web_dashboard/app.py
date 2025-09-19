@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request, send_file
+from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for
 import requests
 import os
 import json
@@ -6,7 +6,11 @@ from datetime import datetime
 import io
 import time
 import random
+from flask_login import LoginManager, current_user
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
+# Initialize app
 app = Flask(__name__)
 
 # Configuration
@@ -15,6 +19,19 @@ ML_SERVICE_URL = os.environ.get('ML_SERVICE_URL', 'http://ml_service:6000')
 PROMETHEUS_URL = os.environ.get('PROMETHEUS_URL', 'http://prometheus:9090')
 GRAFANA_URL = os.environ.get('GRAFANA_URL', 'http://grafana:3000')
 ALERTMANAGER_URL = os.environ.get('ALERTMANAGER_URL', 'http://alertmanager:9093')
+
+# Configure SQLAlchemy
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-key-please-change')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///healthcare.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize SQLAlchemy
+db = SQLAlchemy(app)
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'auth.login'
 
 # In-memory cache for system status
 system_status = {
@@ -29,20 +46,26 @@ system_status = {
 # In-memory cache for recent alerts
 recent_alerts = []
 
-@app.route('/')
-def index():
-    """Main dashboard page"""
-    return render_template('index.html')
+# Import models (must be done before routes)
+from models.user import User, UserSession
+from models.patient import Patient, PatientVitalSign, PatientLocation, PatientMedicalHistory
 
-@app.route('/patients')
-def patients():
-    """Patient monitoring page"""
-    return render_template('patients.html')
+# Import and register routes
+from routes.auth import auth as auth_blueprint
+from routes.patients import patients as patients_blueprint
+from routes.main import main as main_blueprint
 
-@app.route('/analytics')
-def analytics():
-    """Analytics and visualization page"""
-    return render_template('analytics.html')
+# Register blueprints
+app.register_blueprint(auth_blueprint, url_prefix='/auth')
+app.register_blueprint(patients_blueprint, url_prefix='/patients')
+app.register_blueprint(main_blueprint)
+
+# Setup Flask-Login user loader
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
 
 @app.route('/api/patients')
 def get_patients():
@@ -74,11 +97,6 @@ def get_metrics():
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
 
-@app.route('/monitoring')
-def monitoring():
-    """Monitoring integration page"""
-    return render_template('monitoring.html')
-
 @app.route('/api/monitoring-urls')
 def get_monitoring_urls():
     """Get URLs for monitoring services"""
@@ -107,15 +125,7 @@ def simulate_patient(patient_id):
 
 @app.route('/api/grafana-preview')
 def get_grafana_preview():
-    """Get a preview image of the Grafana dashboard
-    
-    In a real implementation, this would:
-    1. Take a screenshot of the Grafana dashboard using Selenium or another tool
-    2. Cache the image for a period of time to avoid overloading Grafana
-    3. Return the image
-    
-    For this example, we'll use a simple text response since we can't generate an image without PIL
-    """
+    """Get a preview image of the Grafana dashboard"""
     try:
         return jsonify({
             "status": "success",
@@ -127,15 +137,7 @@ def get_grafana_preview():
 
 @app.route('/api/system-status')
 def get_system_status():
-    """Get the current status of all services
-    
-    In a real implementation, this would:
-    1. Query Prometheus for the status of each service
-    2. Calculate uptime based on metrics
-    3. Return the status for display
-    
-    For this example, we'll simulate this by updating our in-memory cache
-    """
+    """Get the current status of all services"""
     try:
         # Update the simulated system status
         for service in system_status:
@@ -168,15 +170,7 @@ def get_system_status():
 
 @app.route('/api/recent-alerts')
 def get_recent_alerts():
-    """Get recent alerts from AlertManager
-    
-    In a real implementation, this would:
-    1. Query AlertManager for recent alerts
-    2. Format the alerts for display
-    3. Return the alerts
-    
-    For this example, we'll simulate this by generating random alerts
-    """
+    """Get recent alerts from AlertManager"""
     try:
         # Generate some simulated alerts if our cache is empty
         if not recent_alerts:
@@ -215,6 +209,27 @@ def get_recent_alerts():
         })
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+# Create database tables within application context
+with app.app_context():
+    db.create_all()
+    
+    # Create admin user if no users exist
+    try:
+        if User.query.count() == 0:
+            admin = User(
+                username='admin',
+                email='admin@hospital.com',
+                first_name='System',
+                last_name='Administrator',
+                role='admin'
+            )
+            admin.set_password('admin')
+            db.session.add(admin)
+            db.session.commit()
+            print("Created default admin user: username=admin, password=admin")
+    except Exception as e:
+        print(f"Error creating admin user: {e}")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
