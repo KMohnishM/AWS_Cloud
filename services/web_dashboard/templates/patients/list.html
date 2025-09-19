@@ -39,7 +39,7 @@
         <p class="lead">Manage and monitor patient information</p>
     </div>
     <div class="col-auto d-flex align-items-center">
-        <a href="{{ url_for('patients.add_patient') }}" class="btn btn-primary">
+    <a href="{{ url_for('patients.create_patient') }}" class="btn btn-primary">
             <i class="bi bi-person-plus"></i> Add New Patient
         </a>
     </div>
@@ -114,7 +114,7 @@
     {% else %}
         <div class="col">
             <div class="alert alert-info">
-                No patients found. <a href="{{ url_for('patients.add_patient') }}">Add a new patient</a>.
+                No patients found. <a href="{{ url_for('patients.create_patient') }}">Add a new patient</a>.
             </div>
         </div>
     {% endif %}
@@ -211,7 +211,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <form action="{{ url_for('patients.delete_patient', patient_id=patient.id) }}" method="POST">
+                    {# <form action="{{ url_for('patients.delete_patient', patient_id=patient.id) }}" method="POST"> #}
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </div>
