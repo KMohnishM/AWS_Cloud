@@ -5,19 +5,10 @@ main = Blueprint('main', __name__)
 
 @main.route('/')
 def index():
-    """Landing page for the application"""
-    if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+    """Landing page for the application (now the only dashboard)"""
     return render_template('index.html')
 
-@main.route('/dashboard')
-@login_required
-def dashboard():
-    """Main dashboard showing patient monitoring overview"""
-    return render_template('dashboard.html')
-
 @main.route('/monitoring')
-@login_required
 def monitoring():
-    """Page with the embedded Grafana monitoring dashboard"""
+    """Page with the embedded Grafana monitoring dashboard (public)"""
     return render_template('monitoring.html')

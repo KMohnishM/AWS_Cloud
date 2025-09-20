@@ -38,11 +38,7 @@
         <h1>Patients</h1>
         <p class="lead">Manage and monitor patient information</p>
     </div>
-    <div class="col-auto d-flex align-items-center">
-    <a href="{{ url_for('patients.create_patient') }}" class="btn btn-primary">
-            <i class="bi bi-person-plus"></i> Add New Patient
-        </a>
-    </div>
+    <!-- Add New Patient button removed -->
 </div>
 
 <div class="row mb-4">
@@ -114,16 +110,13 @@
     {% else %}
         <div class="col">
             <div class="alert alert-info">
-                No patients found. <a href="{{ url_for('patients.create_patient') }}">Add a new patient</a>.
-            </div>
-        </div>
-    {% endif %}
-</div>
-
-<!-- List View (Hidden by default) -->
-<div class="row d-none" id="patients-list">
-    <div class="col">
-        <div class="card">
+                No patients found.
+                                    <td>
+                                        <a href="{{ url_for('patients.view_patient', patient_id=patient.patient_id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <!-- Edit and Delete buttons removed -->
+                                    </td>
             <div class="card-body p-0">
                 <div class="table-responsive">
                     <table class="table table-hover mb-0">
@@ -198,26 +191,7 @@
 
 {% if patients %}
     {% for patient in patients %}
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteModal{{ patient.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ patient.id }}" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel{{ patient.id }}">Confirm Deletion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    Are you sure you want to delete patient <strong>{{ patient.first_name }} {{ patient.last_name }}</strong>? This action cannot be undone.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    {# <form action="{{ url_for('patients.delete_patient', patient_id=patient.id) }}" method="POST"> #}
-                        <button type="submit" class="btn btn-danger">Delete</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Delete Confirmation Modal removed -->
     {% endfor %}
 {% endif %}
 {% endblock %}

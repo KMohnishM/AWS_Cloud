@@ -8,36 +8,22 @@ patients = Blueprint('patients', __name__)
 
 # Patient views (HTML pages)
 @patients.route('/patients')
-@login_required
 def list_patients():
-    """Show list of all patients"""
-    if not current_user.has_permission('view_patients'):
-        flash('You do not have permission to view patients.')
-        return redirect(url_for('index'))
-        
+    """Show list of all patients (public, no login required)"""
     all_patients = Patient.query.all()
     return render_template('patients/list.html', patients=all_patients)
 
 @patients.route('/patients/<int:patient_id>')
-@login_required
 def view_patient(patient_id):
-    """Show details for a specific patient"""
-    if not current_user.has_permission('view_patients'):
-        flash('You do not have permission to view patients.')
-        return redirect(url_for('index'))
-        
+    """Show details for a specific patient (public, no login required)"""
     patient = Patient.query.get_or_404(patient_id)
-    
     # Get patient's latest vitals
     latest_vitals = patient.get_recent_vitals(1)
     latest_vital = latest_vitals[0] if latest_vitals else None
-    
     # Get patient's medical history
     medical_history = PatientMedicalHistory.query.filter_by(patient_id=patient_id).order_by(PatientMedicalHistory.diagnosis_date.desc()).all()
-    
     # Get patient's location history
     location_history = PatientLocation.query.filter_by(patient_id=patient_id).order_by(PatientLocation.assigned_at.desc()).all()
-    
     return render_template('patients/view.html', 
                           patient=patient, 
                           latest_vital=latest_vital,
@@ -45,18 +31,11 @@ def view_patient(patient_id):
                           location_history=location_history)
 
 @patients.route('/patients/<int:patient_id>/vitals')
-@login_required
 def patient_vitals(patient_id):
-    """Show vital sign history for a patient"""
-    if not current_user.has_permission('view_vitals'):
-        flash('You do not have permission to view vital signs.')
-        return redirect(url_for('patients.view_patient', patient_id=patient_id))
-        
+    """Show vital sign history for a patient (public, no login required)"""
     patient = Patient.query.get_or_404(patient_id)
-    
     # Get all vitals, ordered by most recent first
     vitals = PatientVitalSign.query.filter_by(patient_id=patient_id).order_by(PatientVitalSign.recorded_at.desc()).all()
-    
     return render_template('patients/vitals.html', patient=patient, vitals=vitals)
 
 @patients.route('/patients/<int:patient_id>/vitals/add', methods=['GET', 'POST'])
