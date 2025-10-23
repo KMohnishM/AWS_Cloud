@@ -1,0 +1,366 @@
+/* WebSocket Debug Console Styles */
+
+.websocket-debug-toggle {
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(52, 152, 219, 0.9);
+    color: white;
+    border: none;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 9995;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.websocket-debug-toggle:hover {
+    transform: rotate(30deg);
+    background-color: rgba(52, 152, 219, 1);
+}
+
+.websocket-debug-panel {
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    width: 380px;
+    max-width: 90vw;
+    max-height: 80vh;
+    background-color: rgba(34, 47, 62, 0.95);
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    color: #ecf0f1;
+    z-index: 9990;
+    font-family: 'Roboto Mono', monospace, system-ui;
+    font-size: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.debug-panel-header {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.debug-panel-header h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #3498db;
+}
+
+.debug-panel-controls {
+    display: flex;
+    gap: 5px;
+}
+
+.debug-btn {
+    background: none;
+    border: none;
+    color: #ecf0f1;
+    cursor: pointer;
+    font-size: 14px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    transition: all 0.2s ease;
+}
+
+.debug-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.debug-panel-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.debug-status-section {
+    padding: 10px 15px;
+    background-color: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 8px;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+}
+
+.status-label {
+    color: #bdc3c7;
+    font-weight: 400;
+}
+
+.status-value {
+    padding: 2px 6px;
+    border-radius: 3px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.status-value.connected {
+    color: #2ecc71;
+}
+
+.status-value.disconnected {
+    color: #e74c3c;
+}
+
+.status-value.reconnecting {
+    color: #f39c12;
+}
+
+.status-value.error {
+    color: #e74c3c;
+}
+
+.status-value.unknown {
+    color: #95a5a6;
+}
+
+.status-value.healthy {
+    color: #2ecc71;
+}
+
+.status-value.unhealthy, 
+.status-value.timeout, 
+.status-value.connection_error {
+    color: #e74c3c;
+}
+
+.status-value.good {
+    color: #2ecc71;
+}
+
+.status-value.medium {
+    color: #f39c12;
+}
+
+.status-value.poor {
+    color: #e74c3c;
+}
+
+.debug-details-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.debug-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.debug-tab-btn {
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    color: #bdc3c7;
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.debug-tab-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #ecf0f1;
+}
+
+.debug-tab-btn.active {
+    color: #3498db;
+    font-weight: 500;
+}
+
+.debug-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #3498db;
+}
+
+.debug-tab-content {
+    display: none;
+    flex: 1;
+    overflow: auto;
+    padding: 10px;
+}
+
+.debug-tab-content.active {
+    display: block;
+    height: 300px;
+    overflow-y: auto;
+}
+
+/* Event log styles */
+.event-log {
+    height: 100%;
+    overflow-y: auto;
+    font-family: 'Roboto Mono', monospace, system-ui;
+    font-size: 11px;
+}
+
+.no-events {
+    text-align: center;
+    color: #95a5a6;
+    padding: 20px 0;
+}
+
+.event-item {
+    padding: 5px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: flex-start;
+}
+
+.event-item:last-child {
+    border-bottom: none;
+}
+
+.event-time {
+    color: #7f8c8d;
+    margin-right: 8px;
+    white-space: nowrap;
+    font-size: 10px;
+    line-height: 18px;
+}
+
+.event-message {
+    flex: 1;
+    word-break: break-word;
+}
+
+.event-info {
+    color: #3498db;
+}
+
+.event-success {
+    color: #2ecc71;
+}
+
+.event-warning {
+    color: #f39c12;
+}
+
+.event-error {
+    color: #e74c3c;
+}
+
+/* Stats tab */
+.stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-gap: 8px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.stat-label {
+    color: #bdc3c7;
+    font-weight: 400;
+}
+
+.stat-value {
+    font-family: 'Roboto Mono', monospace, system-ui;
+}
+
+/* Config tab */
+.debug-config {
+    font-family: 'Roboto Mono', monospace, system-ui;
+    font-size: 11px;
+}
+
+.config-item {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.config-key {
+    color: #3498db;
+    margin-bottom: 3px;
+}
+
+.config-value {
+    word-break: break-word;
+}
+
+/* Custom scrollbar */
+.debug-tab-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.debug-tab-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.debug-tab-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.debug-tab-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Animations */
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.blink {
+    animation: blink 1s infinite;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+    .websocket-debug-panel {
+        width: calc(100% - 40px);
+        right: 20px;
+        max-height: 70vh;
+    }
+    
+    .status-indicator {
+        font-size: 11px;
+    }
+    
+    .debug-status-section {
+        grid-template-columns: 1fr;
+    }
+}
