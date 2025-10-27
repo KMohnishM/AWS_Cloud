@@ -245,8 +245,16 @@ services:
     env_file:
       - ./config/environment/development.env
     environment:
+      # Database configuration - use RDS for production, SQLite for development
       - DATABASE_URL=mysql+pymysql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
-    # Use SQLite for local development (default in app.py)
+      # Service URLs - read from .env file or use defaults
+      - MAIN_HOST_URL=${MAIN_HOST_URL:-http://main_host:8000}
+      - ML_SERVICE_URL=${ML_SERVICE_URL:-http://ml_service:6000}
+      # Monitoring URLs - set these for AWS deployment
+      - GRAFANA_URL=${GRAFANA_URL:-http://grafana:3000}
+      - PROMETHEUS_URL=${PROMETHEUS_URL:-http://prometheus:9090}
+      - ALERTMANAGER_URL=${ALERTMANAGER_URL:-http://alertmanager:9093}
+      - SECRET_KEY=${SECRET_KEY:-dev-key-please-change}
 
 volumes:
   prometheus-data:

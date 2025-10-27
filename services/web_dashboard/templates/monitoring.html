@@ -50,15 +50,15 @@
                                         <div id="grafana-preview" class="grafana-preview-container">
                                             <!-- Embedded Grafana Dashboard -->
                                             <div class="iframe-container">
-                                                <iframe src="http://localhost:3001/d/patient-vitals/patient-vitals-dashboard?orgId=1&refresh=5s&kiosk" width="100%" height="500" frameborder="0" allowfullscreen></iframe>
+                                                <iframe src="{{ grafana_url }}/d/patient-vitals/patient-vitals-dashboard?orgId=1&refresh=5s&kiosk" width="100%" height="500" frameborder="0" allowfullscreen></iframe>
                                             </div>
                                             <p class="text-muted text-center mt-2">Last updated: <span id="grafana-preview-time">Now</span></p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="text-center mt-3">
-                                    <a href="http://localhost:3001/d/patient-vitals/patient-vitals-dashboard?orgId=1&refresh=5s" target="_blank" class="btn btn-primary">View Full Dashboard</a>
-                                    <a href="http://localhost:3001" target="_blank" class="btn btn-outline-primary">Grafana Home</a>
+                                    <a href="{{ grafana_url }}/d/patient-vitals/patient-vitals-dashboard?orgId=1&refresh=5s" target="_blank" class="btn btn-primary">View Full Dashboard</a>
+                                    <a href="{{ grafana_url }}" target="_blank" class="btn btn-outline-primary">Grafana Home</a>
                                     <p class="mt-2"><small>Default credentials: admin/admin</small></p>
                                 </div>
                                 <script>
@@ -76,10 +76,10 @@
                                 <h3>Prometheus Metrics</h3>
                                 <p>Access your Prometheus metrics and query interface.</p>
                                 <div class="iframe-container">
-                                    <iframe src="http://localhost:9090" width="100%" height="600" frameborder="0"></iframe>
+                                    <iframe src="{{ prometheus_url }}" width="100%" height="600" frameborder="0"></iframe>
                                 </div>
                                 <div class="text-center mt-3">
-                                    <a href="http://localhost:9090" target="_blank" class="btn btn-primary">Open in New Window</a>
+                                    <a href="{{ prometheus_url }}" target="_blank" class="btn btn-primary">Open in New Window</a>
                                 </div>
                             </div>
                             
@@ -87,10 +87,10 @@
                                 <h3>AlertManager Alerts</h3>
                                 <p>View and manage active alerts from AlertManager.</p>
                                 <div class="iframe-container">
-                                    <iframe src="http://localhost:9093" width="100%" height="600" frameborder="0"></iframe>
+                                    <iframe src="{{ alertmanager_url }}" width="100%" height="600" frameborder="0"></iframe>
                                 </div>
                                 <div class="text-center mt-3">
-                                    <a href="http://localhost:9093" target="_blank" class="btn btn-primary">Open in New Window</a>
+                                    <a href="{{ alertmanager_url }}" target="_blank" class="btn btn-primary">Open in New Window</a>
                                 </div>
                             </div>
                         </div>

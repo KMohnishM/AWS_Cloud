@@ -66,6 +66,17 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+# Inject monitoring URLs into all templates so templates can use {{ grafana_url }},
+# {{ prometheus_url }} and {{ alertmanager_url }} without changing routes.
+@app.context_processor
+def inject_monitoring_urls():
+    return {
+        'grafana_url': GRAFANA_URL,
+        'prometheus_url': PROMETHEUS_URL,
+        'alertmanager_url': ALERTMANAGER_URL
+    }
+
+
 
 @app.route('/api/patients')
 def get_patients():
