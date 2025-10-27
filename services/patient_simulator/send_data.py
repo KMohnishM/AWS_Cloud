@@ -65,7 +65,21 @@ def get_anomaly_score(data):
     try:
         response = requests.post(ML_MODEL_URL, json=data, timeout=3)
         if response.status_code == 200:
-            return float(response.json().get("anomaly_score", 0.0))
+            response_data = response.json()
+            print(f"DEBUG: ML service response: {response_data}")
+            
+            # Handle both old and new response formats
+            if "normalized_score" in response_data:
+                anomaly_score = float(response_data.get("normalized_score", 0.0))
+                print(f"DEBUG: Using normalized score: {anomaly_score}")
+            elif "anomaly_score" in response_data:
+                anomaly_score = float(response_data.get("anomaly_score", 0.0))
+                print(f"DEBUG: Using legacy anomaly score: {anomaly_score}")
+            else:
+                print("DEBUG: No valid score found in response")
+                anomaly_score = 0.0
+                
+            return anomaly_score
         else:
             print(f"ML service failed with code {response.status_code}")
             return 0.0

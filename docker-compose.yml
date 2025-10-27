@@ -246,8 +246,9 @@ services:
       - ./services/web_dashboard:/app
     env_file:
       - ./config/environment/development.env
-    environment:
-      - DATABASE_URL=mysql+pymysql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+    # environment:
+    #   - DATABASE_URL=mysql+pymysql://${RDS_USERNAME}:${RDS_PASSWORD}@${RDS_HOSTNAME}:${RDS_PORT}/${RDS_DB_NAME}
+    # Use SQLite for local development (default in app.py)
 
 volumes:
   prometheus-data:

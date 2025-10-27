@@ -1,6 +1,6 @@
-{% extends 'base.html' %}
+{% extends 'base_with_sidebar.html' %}
 
-{% block title %}Patient Details | Hospital Monitoring System{% endblock %}
+{% block title %}{% if patient %}{{ patient.first_name }} {{ patient.last_name }} - Details{% else %}Patient Not Found{% endif %} | Hospital Monitoring System{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -54,27 +54,31 @@
 {% endblock %}
 
 {% block content %}
+{% if error %}
+<div class="alert alert-danger">
+    <h4>Error</h4>
+    <p>{{ error }}</p>
+    <a href="{{ url_for('patients.list_patients') }}" class="btn btn-primary">Back to Patients List</a>
+</div>
+{% elif patient %}
 <div class="patient-header d-md-flex align-items-center justify-content-between">
     <div class="d-flex align-items-center mb-3 mb-md-0">
         <div class="me-4">
             <i class="bi bi-person-circle" style="font-size: 4rem; color: #6c757d;"></i>
         </div>
         <div>
-            <h1 class="mb-0">{{ patient.first_name }} {{ patient.last_name }}</h1>
-            <p class="mb-0">ID: {{ patient.id }} | Room: {{ patient.room_number }}</p>
+            <h1 class="mb-0">{{ patient.first_name }}{% if patient.last_name %} {{ patient.last_name }}{% endif %}</h1>
+            <p class="mb-0">ID: {{ patient.patient_id }} | Location: {{ patient.hospital }}/{{ patient.dept }}/{{ patient.ward }}</p>
         </div>
     </div>
     <div class="d-flex align-items-center">
-        <span class="badge status-badge {% if patient.status == 'normal' %}bg-success{% elif patient.status == 'warning' %}bg-warning{% else %}bg-danger{% endif %} me-3">
-            {{ patient.status.capitalize() }}
+        <span class="badge status-badge {% if patient.anomaly_score < 0.3 %}bg-success{% elif patient.anomaly_score < 0.7 %}bg-warning{% else %}bg-danger{% endif %} me-3">
+            {% if patient.anomaly_score < 0.3 %}Normal{% elif patient.anomaly_score < 0.7 %}Warning{% else %}Critical{% endif %}
         </span>
         <div class="btn-group">
-            <a href="{{ url_for('patients.edit_patient', patient_id=patient.id) }}" class="btn btn-outline-primary">
-                <i class="bi bi-pencil"></i> Edit
+            <a href="{{ url_for('patients.list_patients') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
             </a>
-            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                <i class="bi bi-trash"></i> Delete
-            </button>
         </div>
     </div>
 </div>
@@ -177,60 +181,81 @@
                 <a href="#" class="btn btn-sm btn-outline-primary">View History</a>
             </div>
             <div class="card-body">
+                {% if patient.heart_rate %}
                 <div class="vital-sign">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="mb-0">Heart Rate</p>
                             <small class="text-muted">Normal range: 60-100 bpm</small>
                         </div>
-                        <div class="vital-value vital-critical">
-                            135 bpm
+                        <div class="vital-value {% if patient.heart_rate < 60 or patient.heart_rate > 100 %}vital-warning{% else %}vital-normal{% endif %}">
+                            {{ patient.heart_rate|round|int }} bpm
                         </div>
                     </div>
                 </div>
+                {% endif %}
+                
+                {% if patient.bp_systolic and patient.bp_diastolic %}
                 <div class="vital-sign">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="mb-0">Blood Pressure</p>
                             <small class="text-muted">Normal range: 90/60 - 120/80 mmHg</small>
                         </div>
-                        <div class="vital-value vital-normal">
-                            118/78 mmHg
+                        <div class="vital-value {% if patient.bp_systolic > 140 or patient.bp_diastolic > 90 %}vital-warning{% else %}vital-normal{% endif %}">
+                            {{ patient.bp_systolic|round|int }}/{{ patient.bp_diastolic|round|int }} mmHg
                         </div>
                     </div>
                 </div>
+                {% endif %}
+                
+                {% if patient.temperature %}
                 <div class="vital-sign">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="mb-0">Temperature</p>
                             <small class="text-muted">Normal range: 36.1-37.2°C</small>
                         </div>
-                        <div class="vital-value vital-normal">
-                            37.1°C
+                        <div class="vital-value {% if patient.temperature < 36.1 or patient.temperature > 37.2 %}vital-warning{% else %}vital-normal{% endif %}">
+                            {{ "%.1f"|format(patient.temperature) }}°C
                         </div>
                     </div>
                 </div>
+                {% endif %}
+                
+                {% if patient.respiratory_rate %}
                 <div class="vital-sign">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="mb-0">Respiratory Rate</p>
                             <small class="text-muted">Normal range: 12-20 breaths/min</small>
                         </div>
-                        <div class="vital-value vital-normal">
-                            16 breaths/min
+                        <div class="vital-value {% if patient.respiratory_rate < 12 or patient.respiratory_rate > 20 %}vital-warning{% else %}vital-normal{% endif %}">
+                            {{ patient.respiratory_rate|round|int }} breaths/min
                         </div>
                     </div>
                 </div>
+                {% endif %}
+                
+                {% if patient.spo2 %}
                 <div class="vital-sign">
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <p class="mb-0">Blood Oxygen</p>
                             <small class="text-muted">Normal range: 95-100%</small>
                         </div>
-                        <div class="vital-value vital-warning">
-                            92%
+                        <div class="vital-value {% if patient.spo2 < 95 %}vital-warning{% else %}vital-normal{% endif %}">
+                            {{ patient.spo2|round|int }}%
                         </div>
                     </div>
+                </div>
+                {% endif %}
+                
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-clock"></i> 
+                        Last updated: {% if patient.timestamp %}{{ patient.timestamp }}{% else %}Real-time{% endif %}
+                    </small>
                 </div>
             </div>
         </div>
@@ -352,6 +377,13 @@
         </div>
     </div>
 </div>
+{% else %}
+<div class="alert alert-warning">
+    <h4>No Patient Data</h4>
+    <p>Patient information is not available.</p>
+    <a href="{{ url_for('patients.list_patients') }}" class="btn btn-primary">Back to Patients List</a>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}

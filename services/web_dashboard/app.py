@@ -212,24 +212,35 @@ def get_recent_alerts():
 
 # Create database tables within application context
 with app.app_context():
-    db.create_all()
-    
-    # Create admin user if no users exist
     try:
-        if User.query.count() == 0:
-            admin = User(
-                username='admin',
-                email='admin@hospital.com',
-                first_name='System',
-                last_name='Administrator',
-                role='admin'
-            )
-            admin.set_password('admin')
-            db.session.add(admin)
-            db.session.commit()
-            print("Created default admin user: username=admin, password=admin")
-    except Exception as e:
-        print(f"Error creating admin user: {e}")
+        # Create all tables
+        db.create_all()
+        print("✅ Database tables created/verified")
+        
+        # Try to create admin user if no users exist
+        try:
+            user_count = User.query.count()
+            if user_count == 0:
+                admin = User(
+                    username='admin',
+                    email='admin@hospital.com',
+                    first_name='System',
+                    last_name='Administrator',
+                    role='admin'
+                )
+                admin.set_password('admin')
+                db.session.add(admin)
+                db.session.commit()
+                print("✅ Created default admin user: username=admin, password=admin")
+            else:
+                print(f"ℹ️  Database has {user_count} users already")
+        except Exception as user_error:
+            print(f"⚠️  Could not create admin user: {user_error}")
+            print("📝 You may need to run: docker exec web_dashboard python simple_db_init.py")
+            
+    except Exception as db_error:
+        print(f"❌ Database initialization error: {db_error}")
+        print("📝 Run: docker exec web_dashboard python simple_db_init.py")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

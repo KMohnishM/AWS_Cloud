@@ -12,3 +12,8 @@ def index():
 def monitoring():
     """Page with the embedded Grafana monitoring dashboard (public)"""
     return render_template('monitoring.html')
+
+@main.route('/analytics')
+def analytics():
+    """Analytics dashboard with charts and statistics"""
+    return render_template('analytics.html')

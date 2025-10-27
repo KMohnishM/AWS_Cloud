@@ -13,8 +13,7 @@ import json
 # Add the current directory to Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from app import app
-from database import db
+from app import app, db
 from models.user import User
 from models.patient import Patient, PatientLocation, PatientVitalSign, PatientMedicalHistory
 
@@ -34,10 +33,18 @@ def init_database():
             # Create all tables
             print("📋 Creating database tables...")
             db.create_all()
+            db.session.commit()  # Ensure tables are committed
             print("✅ Database tables created successfully!")
             
             # Check if users already exist
-            if User.query.count() > 0:
+            try:
+                user_count = User.query.count()
+                if user_count > 0:
+                    print("ℹ️  Database already contains data. Skipping initialization.")
+                    return
+            except Exception as e:
+                print(f"⚠️  Could not check existing users, proceeding with initialization: {e}")
+                # Continue with initialization
                 print("ℹ️  Database already contains data. Skipping initialization.")
                 return
             
