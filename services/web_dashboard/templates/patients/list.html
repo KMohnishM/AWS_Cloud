@@ -57,6 +57,11 @@
 {% endblock %}
 
 {% block content %}
+<!-- Data Source Info -->
+<div class="alert alert-success mb-3" role="alert">
+    <strong>Data Source:</strong> Main Host API (http://main_host:8000/api/dashboard-data) - Same as home page
+</div>
+
 <!-- Header Section -->
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -234,7 +239,7 @@ function showPatientDetails(patientId) {
     detailsHtml += '<tr><td><strong>Department:</strong></td><td>Department ' + patient.dept + '</td></tr>';
     detailsHtml += '<tr><td><strong>Ward:</strong></td><td>Ward ' + patient.ward + '</td></tr>';
     detailsHtml += '<tr><td><strong>Location:</strong></td><td>' + patient.hospital + '/' + patient.dept + '/' + patient.ward + '</td></tr>';
-    detailsHtml += '<tr><td><strong>Last Update:</strong></td><td>' + (patient.timestamp ? new Date(patient.timestamp).toLocaleString() : 'Real-time') + '</td></tr>';
+    // Removed Last Update timestamp
     detailsHtml += '</table></div></div>';
     
     // Alert Status Card
@@ -378,7 +383,7 @@ function showPatientDetails(patientId) {
     detailsHtml += '<hr>';
     detailsHtml += '<p class="mb-0 text-muted small">';
     detailsHtml += '<i class="bi bi-info-circle"></i> Live monitoring from Hospital System<br>';
-    detailsHtml += '<strong>Last Update:</strong> ' + (patient.timestamp ? new Date(patient.timestamp).toLocaleString() : 'Real-time') + '<br>';
+    // Removed Last Update timestamp
     detailsHtml += '<strong>Data Source:</strong> Main Host API<br>';
     detailsHtml += '<strong>Auto-refresh:</strong> Every 30 seconds';
     detailsHtml += '</p>';

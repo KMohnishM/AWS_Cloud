@@ -56,14 +56,9 @@ def list_patients():
                     }
                     patients_list.append(patient_info)
     
-    # Fallback to database if no data from main host
+    # If no data from main host, show empty list (consistent with home page)
     if not patients_list:
-        try:
-            db_patients = Patient.query.all()
-            patients_list = [p.to_dict() if hasattr(p, 'to_dict') else p for p in db_patients]
-        except:
-            # If database is not available, create dummy data
-            patients_list = []
+        patients_list = []
     
     return render_template('patients/list.html', patients=patients_list)
 
