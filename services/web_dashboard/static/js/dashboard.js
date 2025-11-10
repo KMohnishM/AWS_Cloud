@@ -22,13 +22,6 @@ function fetchDashboardData() {
         })
         .catch(error => {
             console.error('Error fetching metrics:', error);
-            // Show error message to user
-            document.getElementById('total-patients').textContent = 'Error';
-            document.getElementById('critical-patients').textContent = 'Error';
-            document.getElementById('avg-heart-rate').textContent = 'Error';
-            document.getElementById('avg-anomaly-score').textContent = 'Error';
-            document.getElementById('anomalies-list').innerHTML = '<div class="alert alert-danger">Unable to fetch data from Main Host API</div>';
-            document.getElementById('hospital-hierarchy').innerHTML = '<div class="alert alert-danger">Unable to fetch data from Main Host API</div>';
         });
 }
 
@@ -170,9 +163,9 @@ function updateHospitalHierarchy(data) {
                     );
                     
                     let statusClass = 'status-normal';
-                    if (patientData && patientData.anomaly_score > 0.7) {
+                    if (patientData && patientData.anomaly_score > 0.63) {
                         statusClass = 'status-critical';
-                    } else if (patientData && patientData.anomaly_score > 0.5) {
+                    } else if (patientData && patientData.anomaly_score > 0.53) {
                         statusClass = 'status-warning';
                     }
                     
